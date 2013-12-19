@@ -14,25 +14,27 @@ Couchbase Server Settings are in /config/yettings.yml
 
 ### Operations ###
 
-|  VERB  | URL                        | DESC                                                              |
-|:------:|----------------------------|-------------------------------------------------------------------|
-|   GET  | /:key                      | GET document with key from "default" bucket                       |
-|   GET  | /:bucket/:key              | GET key from specified bucket                                     |
-|   PUT  | /:bucket/s/:key            | SET creates or updates a document with key, post data is raw JSON |
-|   PUT  | /:bucket/r/:key            | REPLACE document with key, post data is raw JSON                  |
-|  POST  | /:bucket/a/:key            | ADD operation for document, post data is raw JSON                 |
-|   PUT  | /incr/:key                 | INCR key by 1 default bucket                                      |
-|   PUT  | /incr/:key/:amount         | INCR key by amount, default bucket                                |
-|   PUT  | /incr/:key/:amount/create  | INCR key by amount, or create if needed, default bucket           |
-|   PUT  | /:bucket/incr/:key         | INCR key by 1, specify bucket                                     |
-|   PUT  | /:bucket/incr/:key/:amount | INCR key by amount, specify bucket                                |
-|   PUT  | /:bucket/incr/:key/:amount | INCR key by amount, specify bucket, create if needed              |
-|   PUT  | /decr/:key                 | same ops as incr, but decr in url                                 |
-| DELETE | /:key                      | DELETES document, default bucket                                  |
-| DELETE | /:bucket/:key              | DELETES document from specified bucket                            |
-|   GET  | /ddocs                     | retrieve Design Documents for default bucket                      |
-|   GET  | /ddocs/all                 | retrieve Design Documents for all buckets                         |
-|   GET  | /:bucket/ddocs             | retrieve Design Documents for specified bucket                    |
+|  VERB  | URL                               | DESC                                                              |
+|:------:|-----------------------------------|-------------------------------------------------------------------|
+|   GET  | /:key                             | GET document with key from "default" bucket                       |
+|   GET  | /:bucket/:key                     | GET key from specified bucket                                     |
+|   PUT  | /:bucket/s/:key                   | SET creates or updates a document with key, post data is raw JSON |
+|   PUT  | /:bucket/r/:key                   | REPLACE document with key, post data is raw JSON                  |
+|  POST  | /:bucket/a/:key                   | ADD operation for document, post data is raw JSON                 |
+|   PUT  | /incr/:key                        | INCR key by 1 default bucket                                      |
+|   PUT  | /incr/:key/:amount                | INCR key by amount, default bucket                                |
+|   PUT  | /incr/:key/:amount/create         | INCR key by amount, or create if needed, default bucket           |
+|   PUT  | /:bucket/incr/:key                | INCR key by 1, specify bucket                                     |
+|   PUT  | /:bucket/incr/:key/:amount        | INCR key by amount, specify bucket                                |
+|   PUT  | /:bucket/incr/:key/:amount        | INCR key by amount, specify bucket, create if needed              |
+|   PUT  | /decr/:key                        | same ops as incr, but decr in url                                 |
+| DELETE | /:key                             | DELETES document, default bucket                                  |
+| DELETE | /:bucket/:key                     | DELETES document from specified bucket                            |
+|   GET  | /ddocs                            | retrieve Design Documents for default bucket                      |
+|   GET  | /ddocs/all                        | retrieve Design Documents for all buckets                         |
+|   GET  | /:bucket/ddocs                    | retrieve Design Documents for specified bucket                    |
+|   GET  | /:bucket/dd/:ddoc_name/:view_name | query view with default parameters                                |
+|  POST  | /:bucket/dd/:ddoc_name/:view_name | query view with posted parameters
 
 ### PUT/POST data for set/add/replace takes this format: ###
 
@@ -82,6 +84,6 @@ Couchbase Server Settings are in /config/yettings.yml
 
 * Add Observe possibilities for Storage Operations (tricky with REST)
 * Add append/prepend operations
-* Add View Querying Route
+* Add POST/PUT receive data format error checking/response
 
 

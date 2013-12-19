@@ -325,6 +325,10 @@ class ServeController < ApplicationController
     c, @json = validate_bucket_connection(params)
     return unless @json
     
+    @json.code = 200
+    @json.success = true
+    @json.operation.environment = c.environment
+    
     if params[:all]
       @json.messages << "Design Documents for all buckets requested"
       @json.ddocs = Map.new
@@ -342,11 +346,82 @@ class ServeController < ApplicationController
     render json: @json
   end
   
-  def views
+  def view_query
     c, @json = validate_bucket_connection(params)
     return unless @json
     
+    @json.messages << "Bucket [#{c.bucket}] Design Document [#{params[:ddoc]}] View Query [#{params[:view]}] requested"
     
+    unless c.design_docs.include? params[:ddoc]
+      @json.code = 404
+      @json.success = false
+      @json.messages << "Design Document not found"
+      @json.error_message = "ERROR: Design Document doesn't exist"
+      
+      render json: @json and return
+    end
+    
+    unless c.design_docs[params[:ddoc]].views.include? params[:view]
+      @json.code = 404
+      @json.success = false
+      @json.messages << "View not found"
+      @json.error_message = "ERROR: View doesn't exist"
+      
+      render json: @json and return
+    end
+    
+    #c.design_docs[params[:ddoc]].views.each do |v|
+    #  @json.views << v.class.to_s
+    #end
+    query_params = { 
+      include_docs: false,
+      reduce: false, 
+      limit: 10,
+      descending: false,
+      group: false,
+      stale: :update_after,
+      quiet: true,
+      group: false }
+
+    @json.extra_info = {}
+    @json.extra_info.query_defaults = query_params
+    
+    if params[:post] and params[:post][:options]
+      @json.operation.query_params = query_params.merge!(params[:post][:options].symbolize_keys).recursive_symbolize_keys!
+      @json.operation.query_params.stale = false if @json.operation.query_params.stale == "false" 
+    else      
+      @json.operation.query_params = query_params      
+    end
+    
+    if request.method.upcase == "GET"
+      @json.messages << "GET operation used, will use query_defaults"
+    elsif request.method.upcase == "POST"
+      @json.messages << "POST operation used, will merge query parameters with defaults"
+    end
+    
+    @json.result_data = []
+        
+    c.design_docs[params[:ddoc]].send(params[:view].to_sym, query_params).each do |r|
+      row_values = Map.new({
+        index_key: r.key,
+        row_value: r.value        
+      })
+      if query_params[:include_docs]
+        row_values.doc = r.doc #if query_params.has_key? "include_docs") && query_params["include_docs"]
+      end
+      
+      unless query_params[:reduce]
+        row_values.meta_id = r.id
+      end
+      
+      @json.result_data << row_values
+    end
+
+    @json.code = 200
+    @json.success = true
+    @json.messages << "View Query completed"
+    
+    render json: @json    
   end
   
   
@@ -375,7 +450,7 @@ class ServeController < ApplicationController
     json = Map.new({
       code: 404,
       success: false,
-      operation: { command: caller_locations(1,1)[0].label },
+      operation: { command: caller_locations(1,1)[0].label, method: request.method.upcase },
       messages: []     
     })
     
