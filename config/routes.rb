@@ -24,6 +24,7 @@ RubyCbEsBrowser::Application.routes.draw do
   
   post "/:bucket/a/:key" => 'serve#add'
   put  "/:bucket/s/:key" => 'serve#set'
+  match "/:bucket/s/:key" => 'serve#set', :action => 'options', :constraints => {:method => 'OPTIONS'}, via: :all
   put  "/:bucket/r/:key" => 'serve#replace'
 
   delete "/:bucket/:key" => 'serve#delete'
